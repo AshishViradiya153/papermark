@@ -2,12 +2,13 @@ import { useRouter } from "next/router";
 
 import { memo, useMemo } from "react";
 
-import { FileTree } from "@/components/ui/nextra-filetree";
-
 import {
   DataroomFolderWithDocuments,
   useDataroomFoldersTree,
 } from "@/lib/swr/use-dataroom";
+import { cn } from "@/lib/utils";
+
+import { FileTree } from "@/components/ui/nextra-filetree";
 
 import { buildNestedFolderStructure } from "./utils";
 
@@ -96,6 +97,7 @@ const SidebarFolders = ({
 
   return (
     <FileTree>
+      <SidebarLink href={`/datarooms/${dataroomId}/documents`} label={"Home"} />
       {nestedFolders.map((folder) => (
         <FolderComponent
           key={folder.id}
@@ -114,3 +116,30 @@ export function SidebarFolderTree({ dataroomId }: { dataroomId: string }) {
 
   return <SidebarFolders dataroomId={dataroomId} folders={folders} />;
 }
+
+export const SidebarLink = memo(
+  ({ href, label }: { href: string; label: string }) => {
+    const router = useRouter();
+    const isActive = router.asPath === href;
+
+    return (
+      <li
+        className={cn(
+          "flex list-none",
+          "rounded-md text-foreground duration-100 hover:bg-gray-100 hover:dark:bg-muted",
+          "px-3 py-1.5 leading-6",
+          isActive && "bg-gray-100 font-semibold dark:bg-muted",
+        )}
+      >
+        <span
+          className="ml-5 inline-flex cursor-default items-center"
+          onClick={() => router.push(href)}
+        >
+          <span className="ml-2 w-fit truncate" title={label}>
+            {label}
+          </span>
+        </span>
+      </li>
+    );
+  },
+);
